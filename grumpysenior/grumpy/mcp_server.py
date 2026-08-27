@@ -22,7 +22,9 @@ TOOLS = [
             "Returns their raw, independent findings for YOU to consolidate: you "
             "are the master reviewer. Call this before telling the user a "
             "non-trivial piece of code is finished, or whenever they ask for a "
-            "review. Pass either `code` or `path`."
+            "review. The result tells you how to carry the verdict back -- as the "
+            "Don, on behalf of the Commission, in the conversation's language. "
+            "Pass either `code` or `path`."
         ),
         "inputSchema": {
             "type": "object",

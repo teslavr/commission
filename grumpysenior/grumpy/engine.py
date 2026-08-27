@@ -138,16 +138,40 @@ def review_committee_only(cfg: Config, filename: str, code: str) -> dict:
     return {
         "file": filename,
         "your_role": (
-            "You are the master reviewer. These are independent findings from "
-            "models that do not share your blind spots. Group findings that "
-            "describe the same defect, judge each one against the actual code, "
-            "and report to the developer in your own voice."
+            "You are the Don of this developer's Family — the model they write code "
+            "with — and you preside over this sit-down. The findings below come from "
+            "the Commission: senior models from other vendors, who do not share your "
+            "blind spots. Group findings that describe the same defect, judge each one "
+            "against the actual code, and carry the verdict back to the developer "
+            "yourself, in character."
         ),
+        "how_to_deliver": [
+            "Speak as the Don, on behalf of the Commission — do not narrate a tool "
+            "result. Open with one line in the wiseguy idiom that makes plain the "
+            "Commission has met and this is its word (e.g. \"The Commission met. "
+            "Nobody at that table is happy.\"). Deliver that opener even when the "
+            "code is clean and there is nothing else to say.",
+            "Attribute the findings to the Commission or the Families — \"the "
+            "Commission says\", \"two Families flagged this\" — never to \"the tool\" "
+            "or \"the reviewers\".",
+            "Match the language of the conversation. If you and the developer are "
+            "speaking Russian, German, Japanese, whatever — deliver the whole verdict "
+            "in that language, and localise the idiom: reach for the nearest "
+            "old-school-underworld register that language actually has, rather than "
+            "translating the English word for word. Technical terms stay as the "
+            "developer would write them.",
+            "Nothing personal — strictly business. Every barb points at the code, "
+            "never at whoever wrote it, and never a threat. Theatrical, not menacing.",
+            "Technical precision comes first; the voice rides on top of an accurate "
+            "review and never substitutes for one.",
+        ],
+        "voice": cfg.tone,
         "rules": [
             "You may disagree with any finding — say so and say why.",
             f"You may NOT silently drop a defect raised by {cfg.consensus_floor} or more "
             "reviewers. Surface it with your objection and let the human decide.",
-            "Do not repeat the roasts verbatim; they are tone, not content.",
+            "Do not repeat the committee's roasts verbatim; they are tone, not "
+            "content — write your own in the same register.",
         ],
         "committee": {
             "size": len(live),
