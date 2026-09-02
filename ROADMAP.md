@@ -27,9 +27,46 @@ highest-value thing missing, and the next substantial piece of work.
 cheap model on a trivial diff and the full panel only on risky ones. Easy, but it is a
 tuning problem and tuning without usage data is guessing.
 
-**Languages other than Python.** The Commission reviews anything; only Python fixes get
-mechanically verified. Everything else ships labelled `unverified`, which is honest but
-weaker.
+**Languages other than Python.** The Commission reviews anything — the model calls don't
+care what language they're looking at. The gap is narrower than "only Python is
+supported": verification is Python-only by default, and it's Python only because
+`ast.parse` is a zero-dependency syntax check that ships with the interpreter running
+the tool. Nothing stops another language from being verified the same way — there's
+already an escape hatch (`verify_command` in the config) that runs any external checker
+against the proposed fix in a sandboxed temp dir — but nothing is wired up out of the
+box. No default `tsc --noEmit` for TypeScript, no `go vet` for Go, no `rustc
+--emit=metadata` for Rust, and no per-extension dispatch to pick one automatically.
+That's a day of plumbing — detect the extension, try a short list of common toolchains,
+fall back to `unverified` if none is on `PATH` — not a redesign. Until then, non-Python
+fixes are honestly labelled `unverified` rather than silently trusted, which was the
+right call for a first release but shouldn't be mistaken for a ceiling.
+
+**A subscription tier, instead of a self-managed AWS key.** Onboarding today means a
+trip to the AWS Bedrock console: generate an API key, grant it
+`AmazonBedrockFullAccess` by hand, then separately flip on model access per vendor and
+per region. That is the price of "one credential, every vendor, nothing proxied" — it
+avoids running a service, and it means the tool never touches anyone's request or
+response. But it hands a non-AWS user AWS's own IAM and quota UX, and that is exactly
+the kind of setup friction that makes a good tool look broken before it runs once. A
+subscription — a hosted proxy in front of Bedrock, metered by request or token, no AWS
+account required — would remove that entirely. It is not a config flag; it is a real
+service to run and bill: owning uptime, rate limits shared across customers, and a
+support surface that AWS currently absorbs for free. Worth building once there is
+demand past the people already comfortable pasting an AWS key — not before.
+
+**A real installer.** Getting this running today is: clone or download the repo, have
+Python 3.10+ already on the machine, `pip install -e .` from inside the checkout, then
+separately go generate an AWS key. Every one of those is a place a non-developer bounces
+off. The cheap win is publishing to PyPI so `pip install grumpysenior` works without a
+checkout at all, plus a `pipx install grumpysenior` path so it doesn't fight the
+system Python — that's an afternoon, mostly packaging metadata already in
+`pyproject.toml`. A single `curl | sh` script that checks for Python, installs it via
+`pipx`, and drops straight into `grumpy doctor` closes the rest of the gap for
+Mac/Linux; a signed, notarized binary (PyInstaller or similar) that needs no Python at
+all is the real answer for someone who isn't going to open a terminal, but that's a
+different order of work — build matrix, code signing, an update mechanism — and only
+worth it once the AWS-key step above stops being the bigger blocker. Ship the PyPI
+package first; it's the one that pays for itself immediately.
 
 **A UI.** There is a terminal, a PR comment, and a metrics page. Nothing else is
 planned: the surfaces developers already live in are the point.
