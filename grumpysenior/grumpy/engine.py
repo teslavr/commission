@@ -119,7 +119,9 @@ def review_source(cfg: Config, filename: str, code: str, *, surface: str = "cli"
     return result
 
 
-def review_committee_only(cfg: Config, filename: str, code: str) -> dict:
+def review_committee_only(
+    cfg: Config, filename: str, code: str, *, surface: str = "mcp"
+) -> dict:
     """For when the caller IS the master.
 
     When an agent invokes grumpy from inside its own loop, the model that wrote
@@ -128,12 +130,38 @@ def review_committee_only(cfg: Config, filename: str, code: str) -> dict:
     bury a finding. So we hand the raw committee back and let the caller
     consolidate -- bound by the same rule the built-in master obeys.
     """
+    started = telemetry.now_ms()
     members = run_committee(cfg, filename, code)
     errors = {m.model_id: m.error for m in members if not m.ok and m.error}
     live = [m for m in members if m.ok]
 
     if not live:
         raise RuntimeError("every committee member failed: " + "; ".join(errors.values()))
+
+    findings_by_model: dict[str, int] = {}
+    severity: dict[str, int] = {}
+    usage: dict[str, tuple[int, int]] = {}
+    for member in live:
+        findings_by_model[member.model_id] = len(member.findings)
+        for finding in member.findings:
+            severity[finding.severity] = severity.get(finding.severity, 0) + 1
+        if member.reply:
+            usage[member.model_id] = (member.reply.input_tokens, member.reply.output_tokens)
+
+    telemetry.record_committee(
+        filename=filename,
+        loc=code.count("\n") + 1,
+        surface=surface,
+        elapsed_ms=telemetry.now_ms() - started,
+        reviewers=cfg.committee,
+        live_count=len(live),
+        errors=errors,
+        findings_by_model=findings_by_model,
+        severity=severity,
+        fix_offered=any(m.fixed_code for m in live),
+        usage=usage,
+        prices=cfg.prices,
+    )
 
     return {
         "file": filename,

@@ -61,6 +61,87 @@ def classify_error(message: str) -> str:
     return "other"
 
 
+def _cost(usage: dict | None, prices: dict | None) -> float:
+    return round(
+        sum(
+            (i * p_in + o * p_out) / 1_000_000
+            for m, (i, o) in (usage or {}).items()
+            if (rate := (prices or {}).get(m))
+            for p_in, p_out in [rate]
+        ),
+        6,
+    )
+
+
+def _write(event: dict) -> None:
+    HOME.mkdir(parents=True, exist_ok=True)
+    with EVENTS.open("a") as handle:
+        handle.write(json.dumps(event) + "\n")
+
+
+def record_committee(
+    *,
+    filename: str,
+    loc: int,
+    surface: str,
+    elapsed_ms: int,
+    reviewers: list[str],
+    live_count: int,
+    errors: dict,
+    findings_by_model: dict,
+    severity: dict,
+    fix_offered: bool,
+    usage: dict | None = None,
+    prices: dict | None = None,
+) -> None:
+    """One line per review on the committee-only path.
+
+    The caller consolidates on this path, so nothing here knows how many
+    findings survived grouping, whether the lead dissented, or whether a fix
+    verified -- those fields stay empty rather than guessing. `consolidated_by`
+    says `caller` so the two paths never get silently averaged together.
+    """
+    if DISABLED:
+        return
+    try:
+        _write(
+            {
+                "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "install_id": install_id(),
+                "surface": surface,
+                "file_ext": Path(filename).suffix or "none",
+                "loc": loc,
+                # No lead ran: the agent on the other end of the call is it.
+                "lead_model": None,
+                "reviewers": list(reviewers),
+                "reviewers_ok": live_count,
+                "reviewers_failed": {
+                    model: classify_error(err) for model, err in errors.items()
+                },
+                "findings_raw": sum(findings_by_model.values()),
+                # Grouping happens in the caller, so nothing is "published" here.
+                "issues_published": 0,
+                "unanimous": 0,
+                "corroborated": 0,
+                "contested": 0,
+                "suppressed_by_lead": 0,
+                "severity": {
+                    level: severity.get(level, 0) for level in ("high", "medium", "low")
+                },
+                "raised_by": dict(findings_by_model),
+                "consolidated_by": "caller",
+                "fix_offered": fix_offered,
+                # Verification runs with consolidation, which did not happen here.
+                "fix_status": "unverified" if fix_offered else "none",
+                "elapsed_ms": elapsed_ms,
+                "tokens": {m: {"in": i, "out": o} for m, (i, o) in (usage or {}).items()},
+                "cost_usd": _cost(usage, prices),
+            }
+        )
+    except Exception:
+        pass  # a broken counter must never cost the user a review
+
+
 def record(
     result,
     *,
@@ -116,19 +197,9 @@ def record(
             # whatever the config says, so the arithmetic can be re-checked
             # against a real invoice later.
             "tokens": {m: {"in": i, "out": o} for m, (i, o) in (usage or {}).items()},
-            "cost_usd": round(
-                sum(
-                    (i * p_in + o * p_out) / 1_000_000
-                    for m, (i, o) in (usage or {}).items()
-                    if (rate := (prices or {}).get(m))
-                    for p_in, p_out in [rate]
-                ),
-                6,
-            ),
+            "cost_usd": _cost(usage, prices),
         }
-        HOME.mkdir(parents=True, exist_ok=True)
-        with EVENTS.open("a") as handle:
-            handle.write(json.dumps(event) + "\n")
+        _write(event)
     except Exception:
         pass  # a broken counter must never cost the user a review
 
