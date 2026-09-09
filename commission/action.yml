@@ -1,4 +1,4 @@
-name: GrumpySenior
+name: The Commission
 description: A committee of senior models from other vendors reviews your PR. Yours consolidates.
 inputs:
   aws-region:
@@ -25,5 +25,5 @@ runs:
       env:
         AWS_REGION: ${{ inputs.aws-region }}
       run: |
-        grumpy ${{ inputs.master && format('--master {0}', inputs.master) || '' }} \
+        commish ${{ inputs.master && format('--master {0}', inputs.master) || '' }} \
           review-pr --max-files "${{ inputs.max-files }}" --fail-on "${{ inputs.fail-on }}"

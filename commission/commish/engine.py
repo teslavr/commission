@@ -124,7 +124,7 @@ def review_committee_only(
 ) -> dict:
     """For when the caller IS the master.
 
-    When an agent invokes grumpy from inside its own loop, the model that wrote
+    When an agent invokes commish from inside its own loop, the model that wrote
     the code is already on the other end of this call. Running a separate master
     in Bedrock would add a second voice, a second bill, and a second chance to
     bury a finding. So we hand the raw committee back and let the caller

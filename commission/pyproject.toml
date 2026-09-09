@@ -1,16 +1,16 @@
 [project]
-name = "grumpysenior"
+name = "commission"
 version = "0.1.0"
 description = "A committee of senior models from other vendors reviews your code. Yours consolidates."
 requires-python = ">=3.10"
 dependencies = ["boto3>=1.40", "PyYAML>=6.0"]
 
 [project.scripts]
-grumpy = "grumpy.cli:main"
+commish = "commish.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["grumpy"]
+packages = ["commish"]

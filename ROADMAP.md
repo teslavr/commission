@@ -57,11 +57,11 @@ demand past the people already comfortable pasting an AWS key — not before.
 **A real installer.** Getting this running today is: clone or download the repo, have
 Python 3.10+ already on the machine, `pip install -e .` from inside the checkout, then
 separately go generate an AWS key. Every one of those is a place a non-developer bounces
-off. The cheap win is publishing to PyPI so `pip install grumpysenior` works without a
-checkout at all, plus a `pipx install grumpysenior` path so it doesn't fight the
+off. The cheap win is publishing to PyPI so `pip install commission` works without a
+checkout at all, plus a `pipx install commission` path so it doesn't fight the
 system Python — that's an afternoon, mostly packaging metadata already in
 `pyproject.toml`. A single `curl | sh` script that checks for Python, installs it via
-`pipx`, and drops straight into `grumpy doctor` closes the rest of the gap for
+`pipx`, and drops straight into `commish doctor` closes the rest of the gap for
 Mac/Linux; a signed, notarized binary (PyInstaller or similar) that needs no Python at
 all is the real answer for someone who isn't going to open a terminal, but that's a
 different order of work — build matrix, code signing, an update mechanism — and only

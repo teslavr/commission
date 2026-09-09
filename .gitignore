@@ -8,7 +8,7 @@ DECISIONS.md
 __pycache__/
 *.pyc
 *.egg-info/
-.grumpy.env
+.commish.env
 .env
 
 # Case-study framing for the application — kept out of the product repo

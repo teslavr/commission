@@ -4,7 +4,7 @@
 it by hand:
 
 ```bash
-grumpy dashboard --log docs/events.jsonl --out docs/index.html
+commish dashboard --log docs/events.jsonl --out docs/index.html
 ```
 
 `events.jsonl` is the review event log: one record per review, containing counts only —
@@ -17,4 +17,4 @@ before the first chart existed rather than added afterwards: a tool whose argume
 that source code stays inside the customer's own account cannot make an exception for
 its own telemetry.
 
-Local telemetry writes to `~/.grumpy/` and is disabled with `GRUMPY_NO_TELEMETRY=1`.
+Local telemetry writes to `~/.commish/` and is disabled with `COMMISH_NO_TELEMETRY=1`.

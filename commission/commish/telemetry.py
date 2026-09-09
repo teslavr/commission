@@ -22,12 +22,12 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-HOME = Path(os.environ.get("GRUMPY_HOME", Path.home() / ".grumpy"))
+HOME = Path(os.environ.get("COMMISH_HOME", Path.home() / ".commish"))
 EVENTS = HOME / "events.jsonl"
 INSTALL = HOME / "install_id"
 
 # One switch, honoured everywhere.
-DISABLED = os.environ.get("GRUMPY_NO_TELEMETRY", "").lower() in {"1", "true", "yes"}
+DISABLED = os.environ.get("COMMISH_NO_TELEMETRY", "").lower() in {"1", "true", "yes"}
 
 
 def install_id() -> str:

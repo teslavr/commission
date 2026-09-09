@@ -1,7 +1,7 @@
 {
   "mcpServers": {
-    "grumpysenior": {
-      "command": "grumpy",
+    "commission": {
+      "command": "commish",
       "args": ["mcp"]
     }
   }

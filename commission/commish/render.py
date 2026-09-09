@@ -59,7 +59,7 @@ def render_comment(
     issues: list[Issue],
     verdict: Verdict | None,
 ) -> str:
-    parts = ["## 🎩 GrumpySenior.dev — a sit-down", ""]
+    parts = ["## 🎩 The Commission — a sit-down", ""]
 
     if not issues:
         parts += [

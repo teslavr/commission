@@ -58,11 +58,11 @@ footer { margin-top:48px; padding-top:16px; border-top:1px solid var(--line);
 _TEMPLATE = """<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Metrics — GrumpySenior.dev</title>
+<title>Metrics — The Commission</title>
 <style>{css}</style></head>
 <body><div class="wrap">
 <header>
-<h1>GrumpySenior.dev — metrics</h1>
+<h1>The Commission — metrics</h1>
 <p class="sub">Aggregated from the review event log. Each record contains counts only:
 an anonymous install id, which models ran, what they agreed on, and what it cost.
 No source code, file paths, repository names, or finding text are recorded.</p>
@@ -88,7 +88,7 @@ def render(m: Metrics) -> str:
     generated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     if not m.runs:
         body = ('<div class="empty">No reviews recorded yet. Run '
-                '<code>grumpy review &lt;file&gt;</code> to populate this page.</div>')
+                '<code>commish review &lt;file&gt;</code> to populate this page.</div>')
         return _TEMPLATE.format(css=CSS, generated=generated, body=body, runs=0, plural="s")
 
     p = []
@@ -121,7 +121,7 @@ def render(m: Metrics) -> str:
 
     p.append("<h2>Cost</h2><div class='grid'>")
     p.append(_card(f"${m.median_cost:.4f}", "Median per review",
-                   "At the rates configured in .grumpy.yml. Bedrock pricing varies by region, "
+                   "At the rates configured in .commish.yml. Bedrock pricing varies by region, "
                    "so treat this as arithmetic on your own numbers, not a quote."))
     p.append(_card(f"${m.cost_per_finding:.4f}", "Per finding published",
                    "Total spend divided by findings that reached the reader."))

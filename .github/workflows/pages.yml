@@ -7,8 +7,8 @@ on:
     branches: [main]
     paths:
       - "docs/events.jsonl"
-      - "grumpysenior/grumpy/dashboard.py"
-      - "grumpysenior/grumpy/metrics.py"
+      - "commission/commish/dashboard.py"
+      - "commission/commish/metrics.py"
   workflow_dispatch:
 
 permissions:
@@ -26,12 +26,12 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
 
-      - run: pip install --quiet ./grumpysenior
+      - run: pip install --quiet ./commission
 
       # Every record is anonymous by construction: an install id, which models
       # sat, what they agreed on, what it cost. Nothing about anyone's code is
       # in there — which is the only reason this page is allowed to be public.
-      - run: grumpy dashboard --log docs/events.jsonl --out docs/index.html
+      - run: commish dashboard --log docs/events.jsonl --out docs/index.html
 
       - name: Commit if the metrics changed
         run: |

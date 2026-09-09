@@ -1,11 +1,11 @@
-"""grumpy — the Commission sits on your code. Your own Don presides.
+"""commish — the Commission sits on your code. Your own Don presides.
 
-    grumpy review orders.py
-    grumpy review orders.py --lines 40-90
-    cat snippet.py | grumpy review -
-    grumpy review --staged
-    grumpy review orders.py --format json     # for agents and CI
-    grumpy mcp                                # serve over MCP (any agent)
+    commish review orders.py
+    commish review orders.py --lines 40-90
+    cat snippet.py | commish review -
+    commish review --staged
+    commish review orders.py --format json     # for agents and CI
+    commish mcp                                # serve over MCP (any agent)
 
 Exit codes: 0 = clean, 1 = findings at or above --fail-on, 2 = could not run.
 """
@@ -38,7 +38,7 @@ def explain(failure: str) -> str:
         return no_credentials_message()
     if "accessdenied" in lowered or "not available for this account" in lowered:
         return access_denied_message()
-    return f"grumpy: {failure}"
+    return f"commish: {failure}"
 
 
 def build_config(args) -> Config:
@@ -83,11 +83,11 @@ def cmd_review(args) -> int:
     try:
         sources = collect_sources(args)
     except (FileNotFoundError, ValueError, RuntimeError) as exc:
-        print(f"grumpy: {exc}", file=sys.stderr)
+        print(f"commish: {exc}", file=sys.stderr)
         return 2
 
     if not sources:
-        print("grumpy: nothing to review", file=sys.stderr)
+        print("commish: nothing to review", file=sys.stderr)
         return 0
 
     if not args.quiet:
@@ -188,7 +188,7 @@ def cmd_doctor(args) -> int:
             ok = False
             print(f"  ⚠️  only {len(others)} vendor(s) besides your own can be reached.")
             print("     Agreement between models that share a vendor means little.")
-            print("     Enable models from at least two others: grumpy models")
+            print("     Enable models from at least two others: commish models")
     else:
         denied = any(
             "not available" in note.lower() or "accessdenied" in note.lower()
@@ -199,8 +199,8 @@ def cmd_doctor(args) -> int:
             print("     A model refused you. Two possible causes, fixed in different places:")
             print("       · the key lacks permission — reissue it with AmazonBedrockFullAccess")
             print("       · the model is not enabled — Bedrock console → Model access")
-        print("     `grumpy models` lists what this account and region offer;")
-        print("     put the ids that answer into .grumpy.yml.")
+        print("     `commish models` lists what this account and region offer;")
+        print("     put the ids that answer into .commish.yml.")
     return 0 if ok else 1
 
 
@@ -290,11 +290,11 @@ def cmd_review_pr(args) -> int:
         pr = from_environment()
         files = changed_files(pr)
     except GitHubError as exc:
-        print(f"grumpy: {exc}", file=sys.stderr)
+        print(f"commish: {exc}", file=sys.stderr)
         return 2
 
     if not files:
-        print("grumpy: no reviewable files in this PR", file=sys.stderr)
+        print("commish: no reviewable files in this PR", file=sys.stderr)
         return 0
 
     reviewed, skipped = files[: args.max_files], files[args.max_files :]
@@ -320,7 +320,7 @@ def cmd_review_pr(args) -> int:
         )
 
     if not sections:
-        print("grumpy: nothing worth commenting on", file=sys.stderr)
+        print("commish: nothing worth commenting on", file=sys.stderr)
         return 0
 
     body = "\n\n".join(sections)
@@ -336,9 +336,9 @@ def cmd_review_pr(args) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="grumpy", description=__doc__,
+    parser = argparse.ArgumentParser(prog="commish", description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--config", help="path to .grumpy.yml")
+    parser.add_argument("--config", help="path to .commish.yml")
     parser.add_argument("--master", help="the model you write code with")
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -360,7 +360,7 @@ def main(argv: list[str] | None = None) -> int:
     doctor.set_defaults(func=cmd_doctor)
 
     stats = sub.add_parser("stats", help="review metrics from the local event log")
-    stats.add_argument("--log", help="path to events.jsonl (default ~/.grumpy/events.jsonl)")
+    stats.add_argument("--log", help="path to events.jsonl (default ~/.commish/events.jsonl)")
     stats.set_defaults(func=cmd_stats)
 
     dash = sub.add_parser("dashboard", help="render the metrics page as self-contained HTML")

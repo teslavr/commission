@@ -100,7 +100,7 @@ contested findings that turn out to be real (does the no-veto rule earn its keep
 is it just noise?), and time from review to action.
 
 **These are instrumented, not aspirational.** Every sit-down writes one record, and
-`grumpy stats` and the published page compute exactly the numbers above — including the
+`commish stats` and the published page compute exactly the numbers above — including the
 one that decides whether the product has a floor at all: how often independent Families
 corroborate each other. A kill criterion you cannot compute is a wish.
 

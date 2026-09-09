@@ -17,12 +17,12 @@ except ImportError:  # pragma: no cover
     yaml = None
 
 # One strong model per vendor, all reachable through a single Bedrock credential.
-# Run `grumpy models` to see what your account can actually call -- Bedrock
+# Run `commish models` to see what your account can actually call -- Bedrock
 # model access is off by default and IDs move between regions.
 CATALOG = {
     # Verified live against a real Bedrock account, 2026-08-18.
     # Model access is per-account and geo-restricted (Llama 4 is unavailable in
-    # the EU, for one), so `grumpy models` is not a nicety -- it is how you find
+    # the EU, for one), so `commish models` is not a nicety -- it is how you find
     # out what your account can actually call before the committee fails at 3am.
     "anthropic": "us.anthropic.claude-opus-4-6-v1",
     "meta": "us.meta.llama3-3-70b-instruct-v1:0",
@@ -33,8 +33,8 @@ CATALOG = {
 }
 
 # USD per 1M tokens, (input, output). INDICATIVE ONLY -- Bedrock pricing varies by
-# region and changes without warning. Override in .grumpy.yml with the rates on your
-# own invoice; `grumpy stats` reports what it used so the arithmetic stays checkable.
+# region and changes without warning. Override in .commish.yml with the rates on your
+# own invoice; `commish stats` reports what it used so the arithmetic stays checkable.
 PRICES = {
     "us.anthropic.claude-opus-4-6-v1": (5.00, 25.00),
     "us.anthropic.claude-sonnet-4-6": (3.00, 15.00),
@@ -99,10 +99,10 @@ class Config:
     @classmethod
     def load(cls, path: str | None = None) -> "Config":
         data: dict = {}
-        candidate = Path(path) if path else Path(".grumpy.yml")
+        candidate = Path(path) if path else Path(".commish.yml")
         if candidate.exists():
             if yaml is None:
-                raise RuntimeError("PyYAML is required to read .grumpy.yml")
+                raise RuntimeError("PyYAML is required to read .commish.yml")
             data = yaml.safe_load(candidate.read_text()) or {}
 
         cfg = cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})

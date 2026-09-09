@@ -1,4 +1,4 @@
-# GrumpySenior.dev
+# The Commission
 
 ```
 ⠀⠀⠀⠀⠀⢀⢀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -64,7 +64,7 @@ it. So the floor is enforced in code, not requested in a prompt.
 ## Install
 
 ```bash
-pip install -e ./grumpysenior
+pip install -e ./commission
 ```
 
 Reviewers run through AWS Bedrock — one credential, every vendor.
@@ -80,24 +80,24 @@ write code with.
 Put the key where the tool will find it:
 
 ```bash
-printf 'export AWS_BEARER_TOKEN_BEDROCK=ABSK...\nexport AWS_REGION=us-east-1\n' > ~/.grumpy.env
-chmod 600 ~/.grumpy.env
+printf 'export AWS_BEARER_TOKEN_BEDROCK=ABSK...\nexport AWS_REGION=us-east-1\n' > ~/.commish.env
+chmod 600 ~/.commish.env
 ```
 
 That file is read automatically and never overrides a real environment variable. Then
 see what your account will actually serve:
 
 ```bash
-grumpy models
+commish models
 ```
 
-Then point [`.grumpy.yml`](grumpysenior/.grumpy.yml) at the model you write code with.
+Then point [`.commish.yml`](commission/.commish.yml) at the model you write code with.
 The Commission assembles itself from the other vendors.
 
 Then check the whole thing works before trusting it with anything:
 
 ```bash
-grumpy doctor
+commish doctor
 ```
 
 It verifies the credentials, makes one cheap call to every model you configured, and
@@ -111,13 +111,13 @@ those are different problems and only one of them is your fault.
 ## Use
 
 ```bash
-grumpy review orders.py                    # a file
-grumpy review orders.py --lines 40-90      # a chunk
-pbpaste | grumpy review - --filename x.py  # a snippet
-grumpy review --staged                     # what you are about to commit
-grumpy review orders.py --format json      # for agents and CI
-grumpy mcp                                 # serve to any MCP agent
-grumpy stats                               # your own numbers
+commish review orders.py                    # a file
+commish review orders.py --lines 40-90      # a chunk
+pbpaste | commish review - --filename x.py  # a snippet
+commish review --staged                     # what you are about to commit
+commish review orders.py --format json      # for agents and CI
+commish mcp                                 # serve to any MCP agent
+commish stats                               # your own numbers
 ```
 
 Exit codes: `0` clean, `1` findings at or above `--fail-on`, `2` could not run.
@@ -126,7 +126,7 @@ Exit codes: `0` clean, `1` findings at or above `--fail-on`, `2` could not run.
 
 The CLI is the product; everything else is a thin adapter over it — an **MCP server**
 (Claude Code, Cursor, Codex), a **git pre-commit hook**, a **GitHub Action** for pull
-requests. Setup for each: [`grumpysenior/integrations/`](grumpysenior/integrations/).
+requests. Setup for each: [`commission/integrations/`](commission/integrations/).
 
 When an **agent** calls it, the agent *is* the Don — it wrote the code and it holds the
 conversation — so that path skips the consolidation model entirely and hands the raw
@@ -139,7 +139,7 @@ fix verified, what it cost. **Counts only — no source code, file paths, reposi
 names, or finding text.** A tool whose argument is that your code stays in your own
 account does not get an exception for its own telemetry.
 
-📊 **[Live metrics](https://teslavr.github.io/grumpysenior/)** · `GRUMPY_NO_TELEMETRY=1`
+📊 **[Live metrics](https://teslavr.github.io/commission/)** · `COMMISH_NO_TELEMETRY=1`
 turns it off entirely.
 
 ## Documentation
@@ -154,9 +154,9 @@ turns it off entirely.
 
 Working, and verified against live models. The Commission — Meta Llama 3.3 70B, Mistral
 Pixtral Large, DeepSeek R1 — found both planted defects in
-[`samples/orders.py`](grumpysenior/samples/orders.py) unanimously and independently,
+[`samples/orders.py`](commission/samples/orders.py) unanimously and independently,
 proposed a fix that verified, and correctly found nothing in
-[`samples/clean.py`](grumpysenior/samples/clean.py). Roughly 20 seconds per file.
+[`samples/clean.py`](commission/samples/clean.py). Roughly 20 seconds per file.
 
 It reviews whole files rather than diffs, verifies fixes only for Python, and does not
 yet track which fixes get merged — see [ROADMAP.md](ROADMAP.md).

@@ -1,5 +1,5 @@
 # Copy this into any repo you want reviewed.
-name: GrumpySenior
+name: The Commission
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -23,7 +23,7 @@ jobs:
       # Simpler alternative — replace the step above with repo secrets:
       #   AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY as env on the step below.
 
-      - uses: ./grumpysenior   # or: your-org/grumpysenior@v0
+      - uses: ./commission   # or: your-org/commission@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

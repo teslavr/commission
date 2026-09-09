@@ -15,11 +15,11 @@ from botocore.exceptions import BotoCoreError, ClientError, NoCredentialsError
 from .telemetry import HOME
 
 
-ENV_FILE = Path.home() / ".grumpy.env"
+ENV_FILE = Path.home() / ".commish.env"
 
 
 def load_env_file() -> None:
-    """Read ~/.grumpy.env if it exists, without overriding a real environment.
+    """Read ~/.commish.env if it exists, without overriding a real environment.
 
     Having to `source` something before every review is the kind of friction
     that quietly kills a tool. The file is the user's own, mode 600 by
@@ -95,13 +95,13 @@ NO_CREDENTIALS = """
        export AWS_BEARER_TOKEN_BEDROCK=ABSK...
        export AWS_REGION=us-east-1
 
-     or write those two lines into ~/.grumpy.env and forget about it —
+     or write those two lines into ~/.commish.env and forget about it —
      that file is read automatically and never overrides a real
      environment variable:
 
        printf 'export AWS_BEARER_TOKEN_BEDROCK=ABSK...\n'\
-              'export AWS_REGION=us-east-1\n' > ~/.grumpy.env
-       chmod 600 ~/.grumpy.env
+              'export AWS_REGION=us-east-1\n' > ~/.commish.env
+       chmod 600 ~/.commish.env
 
      Long-lived credentials work too: AWS_ACCESS_KEY_ID and
      AWS_SECRET_ACCESS_KEY, an AWS_PROFILE, or an instance role.
@@ -117,7 +117,7 @@ NO_CREDENTIALS = """
 
   4. Confirm the whole chain before trusting it:
 
-       grumpy doctor
+       commish doctor
 
 {rule}
 """
@@ -146,10 +146,10 @@ ACCESS_DENIED = """
 
   Then:
 
-       grumpy models      # what this account and region will serve
-       grumpy doctor      # whether your configured models answer
+       commish models      # what this account and region will serve
+       commish doctor      # whether your configured models answer
 
-  Put the ids that work into .grumpy.yml. A Commission drawn from one
+  Put the ids that work into .commish.yml. A Commission drawn from one
   vendor is not a Commission — models that share a vendor share their
   blind spots, and their agreement is not evidence of anything.
 
@@ -159,7 +159,7 @@ ACCESS_DENIED = """
 FIRST_RUN = """
   First sit-down. Reviewers run through AWS Bedrock — one credential, every
   vendor — and everything is recorded locally in {home} and never leaves
-  this machine. Turn it off with GRUMPY_NO_TELEMETRY=1.
+  this machine. Turn it off with COMMISH_NO_TELEMETRY=1.
 """
 
 

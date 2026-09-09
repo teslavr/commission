@@ -15,7 +15,7 @@ PROTOCOL = "2025-06-18"
 
 TOOLS = [
     {
-        "name": "grumpy_review",
+        "name": "commish_review",
         "description": (
             "Get a second opinion on code from a committee of senior models from "
             "OTHER vendors than yours -- they do not share your blind spots. "
@@ -46,7 +46,7 @@ TOOLS = [
         },
     },
     {
-        "name": "grumpy_review_changes",
+        "name": "commish_review_changes",
         "description": (
             "Same committee, pointed at the files you have actually changed in this "
             "working tree (uncommitted, or staged). Use before a commit or PR."
@@ -67,14 +67,14 @@ def _text(payload) -> dict:
 
 
 def _call_tool(cfg: Config, name: str, arguments: dict) -> dict:
-    if name == "grumpy_review":
+    if name == "commish_review":
         code = arguments.get("code")
         filename = arguments.get("filename")
         if not code:
             path = arguments.get("path")
             if not path:
                 raise ValueError("pass either `code` or `path`")
-            source = __import__("grumpy.sources", fromlist=["from_file"]).from_file(path)
+            source = __import__("commish.sources", fromlist=["from_file"]).from_file(path)
             code, filename = source.code, filename or source.label
         filename = filename or "snippet.py"
 
@@ -82,7 +82,7 @@ def _call_tool(cfg: Config, name: str, arguments: dict) -> dict:
             return _text(review_source(cfg, filename, code, surface="mcp").as_dict())
         return _text(review_committee_only(cfg, filename, code))
 
-    if name == "grumpy_review_changes":
+    if name == "commish_review_changes":
         sources = from_git(staged=bool(arguments.get("staged")))
         if not sources:
             return _text({"reviewed": [], "note": "no changed files to review"})
@@ -102,7 +102,7 @@ def _handle(cfg: Config, message: dict) -> dict | None:
         result = {
             "protocolVersion": requested,
             "capabilities": {"tools": {}},
-            "serverInfo": {"name": "grumpysenior", "version": "0.1.0"},
+            "serverInfo": {"name": "commission", "version": "0.1.0"},
         }
     elif method == "tools/list":
         result = {"tools": TOOLS}
@@ -139,7 +139,7 @@ def serve(cfg: Config) -> None:
     if cfg.master and not cfg.committee:
         cfg.committee = default_committee(cfg.master)
     print(
-        f"grumpysenior MCP · committee: {', '.join(cfg.committee)} · region: {cfg.region}",
+        f"commission MCP · committee: {', '.join(cfg.committee)} · region: {cfg.region}",
         file=sys.stderr,
         flush=True,
     )

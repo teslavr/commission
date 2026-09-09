@@ -1,4 +1,4 @@
-# GrumpySenior
+# The Commission
 
 The Commission sits on your code. Each Family is a **different model from a different
 vendor**, and none takes another's word for anything. Your own Don presides — and he is
@@ -36,21 +36,21 @@ You need AWS Bedrock: one credential, many vendors. Model access is **off by
 default** — enable it per model in the Bedrock console, then check:
 
 ```bash
-grumpy models          # what this account can actually call, in this region
+commish models          # what this account can actually call, in this region
 ```
 
-Point `.grumpy.yml` at the model you write code with — that is your Don. The Commission
+Point `.commish.yml` at the model you write code with — that is your Don. The Commission
 assembles itself from the other vendors.
 
 ## Use
 
 ```bash
-grumpy review orders.py                    # a file
-grumpy review orders.py --lines 40-90      # a chunk
-pbpaste | grumpy review - --filename x.py  # a snippet
-grumpy review --staged                     # what you are about to commit
-grumpy review orders.py --format json      # for agents and CI
-grumpy mcp                                 # serve to any MCP agent
+commish review orders.py                    # a file
+commish review orders.py --lines 40-90      # a chunk
+pbpaste | commish review - --filename x.py  # a snippet
+commish review --staged                     # what you are about to commit
+commish review orders.py --format json      # for agents and CI
+commish mcp                                 # serve to any MCP agent
 ```
 
 Exit codes: `0` clean, `1` findings at or above `--fail-on`, `2` could not run.
@@ -75,7 +75,7 @@ your code
     └──► output      markdown for humans · JSON for agents · PR comment for teams
 ```
 
-When an **agent** calls grumpy over MCP, the Don's step is skipped: the agent
+When an **agent** calls commish over MCP, the Don's step is skipped: the agent
 that wrote the code is already the Don, so it gets the raw Commission findings
 and the same no-veto rule, and presides itself.
 
@@ -83,13 +83,13 @@ and the same no-veto rule, and presides itself.
 
 | Path | What it is |
 |---|---|
-| `grumpy/engine.py` | the only entry point; every surface calls this |
-| `grumpy/panel.py` | the Commission, sitting in parallel |
-| `grumpy/master.py` | the Don: consolidation, the no-veto rule, fallback clustering |
-| `grumpy/verify.py` | a fix that does not parse is never proposed |
-| `grumpy/providers.py` | Bedrock Converse — one shape for every vendor |
-| `grumpy/mcp_server.py` | stdio JSON-RPC, no dependencies |
-| `grumpy/github.py` | the only file that knows GitHub exists |
+| `commish/engine.py` | the only entry point; every surface calls this |
+| `commish/panel.py` | the Commission, sitting in parallel |
+| `commish/master.py` | the Don: consolidation, the no-veto rule, fallback clustering |
+| `commish/verify.py` | a fix that does not parse is never proposed |
+| `commish/providers.py` | Bedrock Converse — one shape for every vendor |
+| `commish/mcp_server.py` | stdio JSON-RPC, no dependencies |
+| `commish/github.py` | the only file that knows GitHub exists |
 
 ## Known limits
 

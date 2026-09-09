@@ -9,7 +9,7 @@ import urllib.request
 from dataclasses import dataclass
 
 API = "https://api.github.com"
-MARKER = "<!-- grumpysenior -->"
+MARKER = "<!-- commission -->"
 
 
 class GitHubError(RuntimeError):
