@@ -67,7 +67,28 @@ it. So the floor is enforced in code, not requested in a prompt.
 pip install -e ./commission
 ```
 
-Reviewers run through AWS Bedrock — one credential, every vendor.
+Reviewers run through **AWS Bedrock** or **OpenRouter** — either way, one credential,
+every vendor. Pick whichever key you have.
+
+### OpenRouter — the short way
+
+One key, and OpenAI, Google and xAI come with it, which Bedrock does not carry. Make a
+key at [openrouter.ai/keys](https://openrouter.ai/keys), put a few dollars of credit on
+the account (a key on an empty account authenticates and then refuses everything), and:
+
+```bash
+printf 'export OPENROUTER_API_KEY=sk-or-...\n' >> ~/.commish.env
+chmod 600 ~/.commish.env
+```
+
+With only that key set, the Commission picks OpenRouter by itself: Claude Opus presides,
+GPT, Gemini and DeepSeek sit on the Commission. With both keys set it prefers Bedrock —
+choose explicitly with `provider: openrouter` in `.commish.yml`,
+`COMMISH_PROVIDER=openrouter`, or `commish --provider openrouter …`. A Bedrock model id in
+`.commish.yml` is translated to the same vendor's flagship on OpenRouter, so one config
+serves both.
+
+### AWS Bedrock
 
 Generate a **Bedrock API key** (console → Bedrock → API keys) and grant it
 **`AmazonBedrockFullAccess`**. The narrower default lets the key authenticate and then

@@ -3,13 +3,24 @@
 # of *other* vendors, because a model cannot see its own blind spots.
 master: us.anthropic.claude-opus-4-6-v1
 
+# Where the models are called: bedrock | openrouter | auto.
+# auto picks whichever key is set (Bedrock if both). COMMISH_PROVIDER and
+# --provider override this. Model ids written for one provider are translated
+# to the same vendor's flagship on the other, so this file serves both --
+# on OpenRouter the master above becomes anthropic/claude-opus-5.5.
+provider: auto
+
 # Leave empty to auto-assemble. Override when you want specific reviewers.
 # committee:
 #   - us.meta.llama4-maverick-17b-instruct-v1:0
 #   - us.mistral.pixtral-large-2502-v1:0
 #   - us.amazon.nova-premier-v1:0
+# On OpenRouter, ids are vendor/model:
+#   - openai/gpt-6.1-sol
+#   - google/gemini-4-argon
+#   - x-ai/grok-4.7
 
-region: us-east-1
+region: us-east-1   # Bedrock only
 
 # How many committee members must agree before the master loses the right to
 # suppress a finding. This is the whole safety property -- lower it at your peril.

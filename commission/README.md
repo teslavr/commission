@@ -32,11 +32,21 @@ homework, which is the failure mode this product exists to avoid.
 pip install -e .
 ```
 
-You need AWS Bedrock: one credential, many vendors. Model access is **off by
-default** — enable it per model in the Bedrock console, then check:
+You need one credential that reaches many vendors — **AWS Bedrock** or **OpenRouter**:
 
 ```bash
-commish models          # what this account can actually call, in this region
+export OPENROUTER_API_KEY=sk-or-...        # OpenRouter: one key, credit on the account
+# or
+export AWS_BEARER_TOKEN_BEDROCK=ABSK...    # Bedrock: model access is off by default
+```
+
+With one key set, the provider picks itself; with both, Bedrock wins unless you say
+`provider: openrouter` in `.commish.yml`, `COMMISH_PROVIDER=openrouter`, or
+`--provider openrouter`. Then check:
+
+```bash
+commish models          # what the provider will actually serve you
+commish doctor          # one cheap call to every configured model
 ```
 
 Point `.commish.yml` at the model you write code with — that is your Don. The Commission
@@ -87,7 +97,7 @@ and the same no-veto rule, and presides itself.
 | `commish/panel.py` | the Commission, sitting in parallel |
 | `commish/master.py` | the Don: consolidation, the no-veto rule, fallback clustering |
 | `commish/verify.py` | a fix that does not parse is never proposed |
-| `commish/providers.py` | Bedrock Converse — one shape for every vendor |
+| `commish/providers.py` | Bedrock Converse or OpenRouter chat completions — one shape for every vendor |
 | `commish/mcp_server.py` | stdio JSON-RPC, no dependencies |
 | `commish/github.py` | the only file that knows GitHub exists |
 

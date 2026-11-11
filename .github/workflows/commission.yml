@@ -22,6 +22,8 @@ jobs:
           aws-region: us-east-1
       # Simpler alternative — replace the step above with repo secrets:
       #   AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY as env on the step below.
+      # Or skip AWS: drop the step above, set `provider: openrouter` below, and
+      #   add OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }} to its env.
 
       - uses: ./commission   # or: your-org/commission@v0
         env:

@@ -180,7 +180,7 @@ def review(cfg, filename: str, code: str, members: list[PanelMember]) -> Review:
         return Review([], "", None, live, "master")
 
     try:
-        client = runtime_client(cfg.region)
+        client = runtime_client(cfg)
         reply = converse(
             client,
             cfg.master,

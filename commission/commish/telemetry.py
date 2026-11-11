@@ -51,6 +51,8 @@ def classify_error(message: str) -> str:
     for needle, label in (
         ("could not parse json", "bad_output_shape"),
         ("accessdenied", "no_model_access"),
+        ("not available for this account", "no_model_access"),
+        ("insufficientcredits", "no_credits"),
         ("throttl", "throttled"),
         ("timeout", "timeout"),
         ("validationexception", "invalid_request"),

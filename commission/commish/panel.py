@@ -113,7 +113,7 @@ def _review_one(client, model_id: str, filename: str, code: str, cfg) -> PanelMe
 
 
 def run_committee(cfg, filename: str, code: str) -> list[PanelMember]:
-    client = runtime_client(cfg.region)
+    client = runtime_client(cfg)
     with ThreadPoolExecutor(max_workers=max(1, len(cfg.committee))) as pool:
         futures = [pool.submit(_review_one, client, m, filename, code, cfg) for m in cfg.committee]
         return [f.result() for f in futures]

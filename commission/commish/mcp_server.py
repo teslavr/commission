@@ -7,7 +7,7 @@ import json
 import sys
 import traceback
 
-from .config import Config, default_committee
+from .config import Config
 from .engine import review_committee_only, review_source
 from .sources import from_git
 
@@ -114,10 +114,12 @@ def _handle(cfg: Config, message: dict) -> dict | None:
             from .preflight import access_denied_message, credentials_present, no_credentials_message
 
             detail = f"{type(exc).__name__}: {exc}"
-            if not credentials_present():
-                detail = no_credentials_message()
-            elif "accessdenied" in str(exc).lower():
-                detail = access_denied_message()
+            lowered = str(exc).lower()
+            if not credentials_present(cfg.provider):
+                detail = no_credentials_message(cfg.provider)
+            elif any(k in lowered for k in ("accessdenied", "insufficientcredits",
+                                             "not available for this account")):
+                detail = access_denied_message(cfg.provider)
             result = {"content": [{"type": "text", "text": detail}], "isError": True}
     elif method and method.startswith("notifications/"):
         return None  # notifications get no reply
@@ -137,9 +139,9 @@ def _handle(cfg: Config, message: dict) -> dict | None:
 
 def serve(cfg: Config) -> None:
     if cfg.master and not cfg.committee:
-        cfg.committee = default_committee(cfg.master)
+        cfg.finalize()
     print(
-        f"commission MCP · committee: {', '.join(cfg.committee)} · region: {cfg.region}",
+        f"commission MCP · committee: {', '.join(cfg.committee)} · via: {cfg.where}",
         file=sys.stderr,
         flush=True,
     )

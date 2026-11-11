@@ -9,9 +9,6 @@ import os
 import shutil
 from pathlib import Path
 
-import boto3
-from botocore.exceptions import BotoCoreError, ClientError, NoCredentialsError
-
 from .telemetry import HOME
 
 
@@ -45,18 +42,37 @@ def load_env_file() -> None:
         pass
 
 
-def credentials_present() -> bool:
-    """Any credential Bedrock will accept: a Bedrock API key, static keys, a
-    profile, an assumed role, or instance metadata."""
+def credentials_present(provider: str = "bedrock") -> bool:
+    """For OpenRouter, the key. For Bedrock, any credential it will accept: a
+    Bedrock API key, static keys, a profile, an assumed role, or instance
+    metadata."""
     load_env_file()
+    if provider == "openrouter":
+        return bool(os.environ.get("OPENROUTER_API_KEY"))
     if os.environ.get("AWS_BEARER_TOKEN_BEDROCK"):
         return True
     if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY"):
         return True
     try:
+        import boto3
+        from botocore.exceptions import BotoCoreError, ClientError
+
         return boto3.Session().get_credentials() is not None
+    except ImportError:
+        return False
     except (BotoCoreError, ClientError):
         return False
+
+
+def credential_source(provider: str) -> str:
+    """Which variable is doing the work -- never its value."""
+    if provider == "openrouter":
+        return "OPENROUTER_API_KEY"
+    if os.environ.get("AWS_BEARER_TOKEN_BEDROCK"):
+        return "AWS_BEARER_TOKEN_BEDROCK"
+    if os.environ.get("AWS_ACCESS_KEY_ID"):
+        return "AWS_ACCESS_KEY_ID"
+    return "profile or instance role"
 
 
 def is_first_run() -> bool:
@@ -119,6 +135,70 @@ NO_CREDENTIALS = """
 
        commish doctor
 
+  No AWS account? OpenRouter works too — one key, every vendor, and
+  OpenAI and Google come with it:
+
+       https://openrouter.ai/keys  →  Create key
+       export OPENROUTER_API_KEY=sk-or-...      # or put it in ~/.commish.env
+
+  With only that key set, the Commission picks OpenRouter by itself.
+  With both, it prefers Bedrock; say `provider: openrouter` in
+  .commish.yml, COMMISH_PROVIDER=openrouter, or --provider openrouter.
+
+{rule}
+"""
+
+NO_OPENROUTER_KEY = """
+{rule}
+
+  You asked for OpenRouter and brought no key. The Commission does not
+  sit for free.
+
+{rule}
+
+  1. Make a key, and put a few dollars of credit on the account —
+     a key on an empty account authenticates and then refuses:
+
+       https://openrouter.ai/keys  →  Create key
+
+  2. Put it where this tool will find it:
+
+       export OPENROUTER_API_KEY=sk-or-...
+
+     or write that line into ~/.commish.env, read automatically:
+
+       printf 'export OPENROUTER_API_KEY=sk-or-...\n' >> ~/.commish.env
+       chmod 600 ~/.commish.env
+
+  3. Confirm the whole chain:
+
+       commish --provider openrouter doctor
+
+{rule}
+"""
+
+OPENROUTER_REFUSED = """
+{rule}
+
+  OpenRouter heard you. It did not serve you.
+
+  1. 401 — the key is wrong, revoked, or not the one you think is set.
+       https://openrouter.ai/keys
+
+  2. 402 — the account is out of credit. Every model refuses at once,
+     which looks like a broken tool and is a billing page:
+       https://openrouter.ai/credits
+
+  3. 403 / 404 — the key is restricted (a model allowlist, a provider
+     filter, data-policy settings that exclude every host of a model),
+     or the model id is wrong:
+       https://openrouter.ai/settings/privacy
+
+  Then:
+
+       commish models      # every id OpenRouter will take
+       commish doctor      # whether your configured models answer
+
 {rule}
 """
 
@@ -157,26 +237,30 @@ ACCESS_DENIED = """
 """
 
 FIRST_RUN = """
-  First sit-down. Reviewers run through AWS Bedrock — one credential, every
+  First sit-down. Reviewers run through {via} — one credential, every
   vendor — and everything is recorded locally in {home} and never leaves
   this machine. Turn it off with COMMISH_NO_TELEMETRY=1.
 """
 
-
-def no_credentials_message() -> str:
-    return NO_CREDENTIALS.format(rule=_rule())
+_VIA = {"bedrock": "AWS Bedrock", "openrouter": "OpenRouter"}
 
 
-def access_denied_message() -> str:
-    return ACCESS_DENIED.format(rule=_rule())
+def no_credentials_message(provider: str = "bedrock") -> str:
+    template = NO_OPENROUTER_KEY if provider == "openrouter" else NO_CREDENTIALS
+    return template.format(rule=_rule())
 
 
-def first_run_message() -> str:
-    return FIRST_RUN.format(home=HOME)
+def access_denied_message(provider: str = "bedrock") -> str:
+    template = OPENROUTER_REFUSED if provider == "openrouter" else ACCESS_DENIED
+    return template.format(rule=_rule())
 
 
-def check(quiet: bool = False) -> str | None:
+def first_run_message(provider: str = "bedrock") -> str:
+    return FIRST_RUN.format(home=HOME, via=_VIA.get(provider, provider))
+
+
+def check(provider: str = "bedrock") -> str | None:
     """Returns a message to print and exit on, or None to proceed."""
-    if not credentials_present():
-        return no_credentials_message()
+    if not credentials_present(provider):
+        return no_credentials_message(provider)
     return None

@@ -1,6 +1,9 @@
 name: The Commission
 description: A committee of senior models from other vendors reviews your PR. Yours consolidates.
 inputs:
+  provider:
+    description: bedrock | openrouter | auto (auto picks whichever key the job has)
+    default: auto
   aws-region:
     description: Bedrock region
     default: us-east-1
@@ -24,6 +27,7 @@ runs:
     - shell: bash
       env:
         AWS_REGION: ${{ inputs.aws-region }}
+        COMMISH_PROVIDER: ${{ inputs.provider }}
       run: |
         commish ${{ inputs.master && format('--master {0}', inputs.master) || '' }} \
           review-pr --max-files "${{ inputs.max-files }}" --fail-on "${{ inputs.fail-on }}"

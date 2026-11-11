@@ -22,6 +22,9 @@ itself. One voice, no second bill.
 }
 ```
 
+On OpenRouter instead, swap the env for `{ "COMMISH_PROVIDER": "openrouter" }` and keep
+the key in `~/.commish.env` (or pass `OPENROUTER_API_KEY` there too).
+
 **Cursor** — `.cursor/mcp.json`, same object.
 **Codex** — `~/.codex/config.toml`:
 
